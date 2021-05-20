@@ -1,0 +1,7 @@
+{
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "json-20210307.jar",
+    "javacord-3.3.0-shaded.jar"
+  ]
+}
