@@ -19,7 +19,7 @@ public class Print{
   private DiscordApi bot = new DiscordApiBuilder().setToken("ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.Z3rBemeRV3vsiUNridUqtwAtwXE").login().join();
   private boolean registering = false;
   private static MouseListener listener = new MouseListener();
-  private JSONObject registeringItem;
+  private String registeringItem;
   private String loc = System.getProperty("user.home") + "/Desktop/";
 
   Print() {
@@ -41,12 +41,11 @@ public class Print{
 
       // Register Discord bot listeners.
       bot.addMessageCreateListener(event -> {
-        //{"code":"L2","price":[5.45],"name":"Chicken Chow Mein","type":0}
         if (registering && !event.getMessageAuthor().isBotUser()){
           // Index number;
           try {
-            registeringItem = menu.getJSONArray("items").getJSONObject(Integer.parseInt(event.getMessageContent()));  
-            event.getChannel().sendMessage("Registering clicks to navigate to item `" + registeringItem.getString("code") + ". " + registeringItem.getString("name") + "`. Message `!s` to stop.");
+            registeringItem = event.getMessageContent();
+            event.getChannel().sendMessage("Registering clicks to navigate to item `" + registeringItem + "`. Message `!s` to stop.");
             registering = false;
             listener.listen();
           }
@@ -58,12 +57,12 @@ public class Print{
         }
         if (event.getMessageContent().equalsIgnoreCase("!r")) {
           // Get the last item not registered yet.
-          event.getChannel().sendMessage("Please enter the `item[]` index you wish to register clicks for.");
+          event.getChannel().sendMessage("Please enter the item you wish to register clicks for.");
           registering = true;
         }
         else if (event.getMessageContent().equalsIgnoreCase("!s")) {
           // Save clickCoords to a file.
-          String pos = loc + "positions/" + registeringItem.getString("name") + ".txt";
+          String pos = loc + "positions/" + registeringItem + ".txt";
           File saveTo = new File(pos);
           // Delete if exists.
           if (saveTo.exists())
@@ -84,9 +83,11 @@ public class Print{
           }
           
         }
+
       });
 
       System.out.println(getAllItemsInCategory(3));
+      clickItem("L1", 0);
     }
     catch(FileNotFoundException e){
       e.printStackTrace();
@@ -101,8 +102,29 @@ public class Print{
   public void clickItem(String code, int type){
     // TO-DO: Enter edge cases manually here.
 
+    /*
+    
+    [1] [2] [3] [4]
+    [5] [6] [7] [8]
+    ... 
+    
+    */
+    // Get the exact grid position.
+    int position = locationWithinCategory(code, type);
 
-    // 
+    // Get the number of rows need to shift down.
+    int shiftsDown = numberOfShiftsDown(position);
+
+    
+  }
+
+  /**
+   * Determines how many times we need to shift the cursor downwards from the first row.
+   * @param position
+   * @return int
+   */
+  public int numberOfShiftsDown(int position){
+    return position/4;
   }
 
   /**
