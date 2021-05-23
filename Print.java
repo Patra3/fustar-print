@@ -234,9 +234,6 @@ public class Print {
       else if (code.equals("S12") && choice.equals("Shrimp")){
         target += 13;
       }
-      else if (code.equals("S12")){
-        target += 13; // Assume shrimp?
-      }
       else if (code.equals("S13")){
         target += 14;
       }
@@ -249,7 +246,7 @@ public class Print {
       else if (code.equals("S16")){
         target += 17;
       }
-      // TO-DO: Side order!
+      // Side order manually added hopefully :)
       else {
         // Test only with number parsing.
         try {
