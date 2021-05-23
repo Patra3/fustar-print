@@ -4,5 +4,6 @@
     "json-20210307.jar",
     "javacord-3.3.0-shaded.jar",
     "jnativehook-2.1.0.jar"
-  ]
+  ],
+  "deepscan.ignoreConfirmWarning": true
 }
