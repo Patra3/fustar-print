@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Robot;
@@ -86,6 +87,32 @@ public class Print {
           }
           
         }
+        else if (event.getMessageContent().equalsIgnoreCase("!ultimatetest")){
+          menu.getJSONArray("items").forEach(item -> {
+            try{
+              TimeUnit.MILLISECONDS.sleep(500);
+              JSONObject i = (JSONObject)item;
+              if (i.has("choice")){
+                for (int choiceIndex = 0; choiceIndex < i.getJSONArray("choice").length(); choiceIndex++){
+                  clickItem(i.getString("code"), i.getInt("type"), i.getJSONArray("choice").getString(choiceIndex));
+                }
+              }
+              else if (i.getJSONArray("price").length() > 1){
+                clickItem(i.getString("code"), i.getInt("type"), "");
+                clickSmall();
+                clickItem(i.getString("code"), i.getInt("type"), "");
+                clickLarge();
+              }
+              else{
+                clickItem(i.getString("code"), i.getInt("type"), "");
+              }
+            }
+            catch(InterruptedException e){
+              e.printStackTrace();
+            }
+          });
+          event.getChannel().sendMessage("Task completed.");
+        }
         else{
           String[] messageParts = event.getMessageContent().split(" ");
           if (messageParts[0].equalsIgnoreCase("!click")){
@@ -110,6 +137,47 @@ public class Print {
         fx = i;
     });
     return this.fx;
+  }
+
+  /**
+   * Type on POS keyboard.
+   * @param text
+   */
+  public void keyboard(String text){
+    // TO-DO
+  }
+
+  /**
+   * Type on POS numpad.
+   * @param numbers
+   */
+  public void numpad(String numbers){
+    // TO-DO
+
+  }
+
+  /**
+   * Click the "small" option.
+   */
+  public void clickSmall(){
+    try {
+      click("click_small");
+    }
+    catch(FileNotFoundException e){
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Click the "large" option.
+   */
+  public void clickLarge(){
+    try {
+      click("click_large");
+    }
+    catch(FileNotFoundException e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -252,7 +320,10 @@ public class Print {
         try {
           Integer itemCode = Integer.parseInt(code);
           // Manual fix for chicken.
-          if (itemCode > 40 && itemCode < 62){
+          if (itemCode > 40 && itemCode < 62 && itemCode != 51){
+            target += locationWithinCategory(code, type);
+          }
+          else if (itemCode == 51){
             target += locationWithinCategory(code, type);
           }
           else{
@@ -268,6 +339,9 @@ public class Print {
       }
       try {
         click(target);
+        if (code.equals("51") || code.equals("68")){
+          click("cancel_choice_dialog");
+        }
       }
       catch(FileNotFoundException f){
         f.printStackTrace();
