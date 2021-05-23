@@ -150,6 +150,9 @@ public class Print {
       }
       click(name);
     }
+    else if (type == 1){
+      // Appetizer hard code
+    }
 
     else{
 
