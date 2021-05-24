@@ -1,13 +1,21 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
+import javax.swing.JOptionPane;
+
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -25,6 +33,7 @@ public class Print {
   private String registeringItem;
   private String loc = System.getProperty("user.home") + "/Desktop/";
   private JSONObject fx;
+  private ArrayList<JSONObject> queuedOrders = new ArrayList<>();
 
   Print() {
     try {
@@ -128,6 +137,178 @@ public class Print {
     catch(FileNotFoundException e){
       e.printStackTrace();
     }
+
+    while(true){
+      try{
+        TimeUnit.SECONDS.sleep(10);
+        run();
+      }
+      catch(InterruptedException e){
+        e.printStackTrace();
+        System.out.println("CRITICAL ERROR!");
+      }
+    }
+  }
+
+  public void run(){
+    System.out.println("Checking for online order activity...");
+    String requestUrl = "https://www.fustarbuffet.com/online-order-api/fetch/jbj9zhRM6CpucC46ezQU6nJy";
+    URL url;
+    try {
+      url = new URL(requestUrl);
+      HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+      if (con != null){
+        try {
+          BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+          StringBuilder wholeData = new StringBuilder();
+          String line;
+          while ((line = br.readLine()) != null){
+            wholeData.append(line);
+          }
+          String finalData = wholeData.toString();
+          JSONArray par = new JSONArray(finalData);
+          if (par.length() == 0){
+            // Attempt to enter queued orders, if there are any.
+            System.out.println(queuedOrders.size() + " total orders");
+            if (this.isOnTakeoutScreen()){
+              queuedOrders.forEach(item -> {
+                this.enterOrder(item);
+              });
+              queuedOrders = new ArrayList<>();
+            }
+          }
+          if (par.length() > 0){
+            if (!this.isOnTakeoutScreen()){
+              JOptionPane.showMessageDialog(null, "New online order! Please return to Takeout menu!; ¡Nuevo pedido en línea! ¡Regrese al menú de comida para llevar!; 新的在线订单！ 请返回外卖菜单！");
+            }
+          }
+          par.forEach(item -> {
+            queuedOrders.add((JSONObject)item);
+          });
+        }
+        catch(IOException f){
+          f.printStackTrace();
+        }
+      }
+    }
+    catch(MalformedURLException e){
+      e.printStackTrace();
+    }
+    catch(IOException e){
+      e.printStackTrace();
+    }
+    return;
+  }
+
+  /**
+   * Returns true if on takeout screen, false otherwise.
+   * @return
+   */
+  public boolean isOnTakeoutScreen(){
+    try {
+      Robot b = new Robot();
+      b.mouseMove(600, 600);
+      BufferedImage img = b.createScreenCapture(new Rectangle(0, 0, 147, 123));
+      File dir = new File(loc + "dataset/");
+      if (!dir.exists())
+        dir.mkdir();
+      File out = new File(loc + "dataset/out.png");
+      out.createNewFile();
+      ImageIO.write(img, "png", out);
+      // Compare
+      boolean result = ImageUtils.visuallyCompare(out, new File(loc + "dataset/Capture.png"));
+      out.delete();
+      return result;
+    }
+    catch(Exception e){
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  /**
+   * Enter in an online order given its JSON makeup as found on the endpoint.
+   * @param jsonContent
+   */
+  public void enterOrder(JSONObject order){
+    // First let us make a log folder if it doesn't exist.
+    File logFolder = new File(loc + "logs/");
+    if (!logFolder.exists())
+      logFolder.mkdir();
+    
+    // Save order to the log folder.
+    File saveTo = new File(loc + "logs/" + order.getString("name") + ".txt");
+    if (saveTo.exists())
+      saveTo.delete();
+    try {
+      FileWriter writer = new FileWriter(saveTo.getAbsolutePath());
+      writer.write(order.toString());
+      writer.close();
+    }
+    catch(Exception e){
+      e.printStackTrace();
+    }
+
+    // Begin by entering the phone number and name.
+    try {
+      click("start_new_order");
+      TimeUnit.MILLISECONDS.sleep(200);
+      click("phone");
+      JSONObject contents = order.getJSONObject("body");
+      numpad(contents.getString("customerPhone"));
+      click("numpad_enter");
+      TimeUnit.SECONDS.sleep(2);
+      click("click_small");
+      // Enter customer name.
+      TimeUnit.SECONDS.sleep(5);
+      click("customerNameClick");
+      TimeUnit.SECONDS.sleep(1);
+      click("customerNameClick");
+      TimeUnit.SECONDS.sleep(1);
+      keyboard(contents.getString("customerName"));
+      TimeUnit.SECONDS.sleep(1);
+      click("submit_keyboard_char");
+      TimeUnit.SECONDS.sleep(2);
+      // Begin entering order items.
+      contents.getJSONArray("items").forEach(i -> {
+        try {
+          TimeUnit.MILLISECONDS.sleep(200);
+          JSONObject item = (JSONObject)i;
+          String code = item.getString("name").split("\\.")[0];
+          int type = new JSONObject(new String(Base64.getDecoder().decode(item.getString("menuItemReference")))).getInt("type");
+          clickItem(code, type, item.getString("type"));
+          try {
+            // Enter quantity.
+            click("quantity");
+            TimeUnit.SECONDS.sleep(1);
+            numpad(item.getString("quantity"));
+            click("finish_quantity");
+            TimeUnit.SECONDS.sleep(2);
+            // Enter comments.
+            if (item.getString("comments").length() > 2){
+              click("custom_choice");
+              TimeUnit.SECONDS.sleep(1);
+              keyboard(item.getString("comments"));
+              TimeUnit.SECONDS.sleep(4);
+              click("grid_27"); // Hack
+            }
+          }
+          catch(FileNotFoundException f){
+            f.printStackTrace();
+          }
+        }
+        catch(InterruptedException g){
+          g.printStackTrace();
+        }
+      });
+      TimeUnit.SECONDS.sleep(1);
+      // Submit order.
+      click("finish_order");
+      TimeUnit.SECONDS.sleep(10);
+    }
+    catch(Exception e){
+      e.printStackTrace();
+    }
   }
 
   public JSONObject getMenuItem(String code){
@@ -140,20 +321,39 @@ public class Print {
   }
 
   /**
-   * Type on POS keyboard.
+   * Type on POS keyboard. KEYBOARD MUST BE OPEN!
    * @param text
    */
   public void keyboard(String text){
-    // TO-DO
+    String[] characters = text.split("");
+    for (String character : characters){
+      try{
+        if (character.equals(" "))
+          click("space");
+        else
+          click(character);
+      }
+      catch(FileNotFoundException e){
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
-   * Type on POS numpad.
+   * Type on POS numpad. NUMPAD MUST BE OPEN!
    * @param numbers
    */
   public void numpad(String numbers){
     // TO-DO
-
+    String[] characters = numbers.split("");
+    for (String character : characters){
+      try{
+        click("numpad_" + character);
+      }
+      catch(FileNotFoundException e){
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
