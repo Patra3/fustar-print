@@ -278,6 +278,11 @@ public class Print {
           int type = new JSONObject(new String(Base64.getDecoder().decode(item.getString("menuItemReference")))).getInt("type");
           clickItem(code, type, item.getString("type"));
           try {
+            // Enter size if there is.
+            if (item.getString("size").length() > 0){
+              click("click_" + item.getString("size").toLowerCase());
+            }
+            TimeUnit.SECONDS.sleep(1);
             // Enter quantity.
             click("quantity");
             TimeUnit.SECONDS.sleep(1);
