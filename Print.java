@@ -280,7 +280,10 @@ public class Print {
           try {
             // Enter size if there is.
             if (item.getString("size").length() > 0){
-              click("click_" + item.getString("size").toLowerCase());
+              // Check to see if item has price.
+              JSONObject menuItemx = getMenuItem(code);
+              if (menuItemx.getJSONArray("price").length() > 1)
+                click("click_" + item.getString("size").toLowerCase());
             }
             TimeUnit.SECONDS.sleep(1);
             // Enter quantity.
