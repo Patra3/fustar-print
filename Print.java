@@ -249,6 +249,9 @@ public class Print {
       e.printStackTrace();
     }
 
+    // Send to Discord as log.
+    bot.getTextChannelById("846539944578515005").get().sendMessage(saveTo);
+
     // Begin by entering the phone number and name.
     try {
       click("start_new_order");
