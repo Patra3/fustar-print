@@ -27,7 +27,7 @@ import org.json.JSONObject;
 public class Print {
   
   private JSONObject menu;
-  private DiscordApi bot = new DiscordApiBuilder().setToken("ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.Z3rBemeRV3vsiUNridUqtwAtwXE").login().join();
+  //private DiscordApi bot = new DiscordApiBuilder().setToken("ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.Z3rBemeRV3vsiUNridUqtwAtwXE").login().join();
   private boolean registering = false;
   private static MouseListener listener = new MouseListener();
   private String registeringItem;
@@ -51,7 +51,7 @@ public class Print {
       File folder = new File(loc + "positions/");
       if (!folder.exists())
         folder.mkdirs();
-
+/*
       // Register Discord bot listeners.
       bot.addMessageCreateListener(event -> {
         if (registering && !event.getMessageAuthor().isBotUser()){
@@ -133,6 +133,7 @@ public class Print {
           }
         }
       });
+      */
     }
     catch(FileNotFoundException e){
       e.printStackTrace();
@@ -250,7 +251,7 @@ public class Print {
     }
 
     // Send to Discord as log.
-    bot.getTextChannelById("846539944578515005").get().sendMessage(saveTo);
+    //bot.getTextChannelById("846539944578515005").get().sendMessage(saveTo);
 
     // Begin by entering the phone number and name.
     try {
