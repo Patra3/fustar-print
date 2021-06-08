@@ -27,7 +27,7 @@ import org.json.JSONObject;
 public class Print {
   
   private JSONObject menu;
-  //private DiscordApi bot = new DiscordApiBuilder().setToken("ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.Z3rBemeRV3vsiUNridUqtwAtwXE").login().join();
+  private DiscordApi bot = new DiscordApiBuilder().setToken("ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.Z3rBemeRV3vsiUNridUqtwAtwXE").login().join();
   private boolean registering = false;
   private static MouseListener listener = new MouseListener();
   private String registeringItem;
@@ -51,7 +51,7 @@ public class Print {
       File folder = new File(loc + "positions/");
       if (!folder.exists())
         folder.mkdirs();
-/*
+
       // Register Discord bot listeners.
       bot.addMessageCreateListener(event -> {
         if (registering && !event.getMessageAuthor().isBotUser()){
@@ -128,12 +128,16 @@ public class Print {
             // Item is mp[1]
             // We need to find the type first.
             JSONObject i = getMenuItem(messageParts[1]);
-            clickItem(messageParts[1], i.getInt("type"), "");
+            String choice = "";
+            if (messageParts.length > 2){
+              choice += messageParts[2];
+            }
+            clickItem(messageParts[1], i.getInt("type"), choice);
             event.getChannel().sendMessage("Click sent!");
           }
         }
       });
-      */
+      
     }
     catch(FileNotFoundException e){
       e.printStackTrace();
@@ -251,7 +255,12 @@ public class Print {
     }
 
     // Send to Discord as log.
-    //bot.getTextChannelById("846539944578515005").get().sendMessage(saveTo);
+    try {
+      bot.getTextChannelById("846539944578515005").get().sendMessage(saveTo);
+    }
+    catch(Exception e){
+      System.out.println("Unable to upload log to Discord.");
+    }
 
     // Begin by entering the phone number and name.
     try {
@@ -397,7 +406,6 @@ public class Print {
    * @param code i.e.  C4
    * @param type i.e.  Lunch Special = 0
    * @param choice i.e. Pork, chicken
-   * @param size i.e. Small
    */
   public void clickItem(String code, int type, String choice){
 
