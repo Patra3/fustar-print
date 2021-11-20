@@ -279,6 +279,7 @@ public class Print {
       click("customerNameClick");
       TimeUnit.SECONDS.sleep(1);
       keyboard(contents.getString("customerName"));
+      keyboard("  need ready for " + contents.getString("customerTime"));
       TimeUnit.SECONDS.sleep(1);
       click("submit_keyboard_char");
       TimeUnit.SECONDS.sleep(2);
@@ -613,7 +614,7 @@ public class Print {
       int x = point.get(0), y = point.get(1);
       click(x, y);
     }
-  }
+  } 
 
   /**
    * Determines how many times we need to shift the cursor downwards from the first row.
