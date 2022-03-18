@@ -23,7 +23,7 @@ public class ProcessOrder {
       if (!file.exists())
         file.mkdirs();
       // Write as file into the folder.
-      Path f = Paths.get("orders/" + order.getString("name") + ".txt");
+      Path f = Paths.get("orders/" + order.getString("name") + ".json");
       try {
         Files.write(f, order.toString().getBytes());
       }
