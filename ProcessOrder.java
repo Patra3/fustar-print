@@ -26,6 +26,7 @@ public class ProcessOrder {
       Path f = Paths.get("orders/" + order.getString("name") + ".json");
       try {
         Files.write(f, order.toString().getBytes());
+        EnterOrderTask.addOrderToCache(order);
       }
       catch(IOException e){
         e.printStackTrace();
