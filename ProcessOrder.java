@@ -33,4 +33,29 @@ public class ProcessOrder {
       }
     }
   }
+
+  /**
+   * Processes online orders in test mode.
+   * @param data
+   */
+  public static void testProcess(Main main, String data){
+    JSONArray orders = new JSONArray(data);
+    // Create a log history locally and on Discord.
+    for (int i = 0; i < orders.length(); i++){
+      JSONObject order = orders.getJSONObject(i);
+      File file = new File("orders/");
+      // Check if backup folder exists.
+      if (!file.exists())
+        file.mkdirs();
+      // Write as file into the folder.
+      Path f = Paths.get("orders/" + order.getString("name") + ".json");
+      try {
+        Files.write(f, order.toString().getBytes());
+        main.testOrder(order);
+      }
+      catch(IOException e){
+        e.printStackTrace();
+      }
+    }
+  }
 }

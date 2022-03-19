@@ -26,12 +26,18 @@ public class Main {
 
   protected int ordersProcessed = 0;
 
+  protected EnterOrderTask enterOrderTask = new EnterOrderTask(this);
+
+  public void testOrder(JSONObject order){
+    enterOrderTask.enterOrder(true, order);
+  }
+
   public Main(){
     // First we init the Discord bot status.
     bot.updateActivity(" orders: " + ordersProcessed);
     // Next, we schedule a repeating task to check the online ordering server.
     timer.scheduleAtFixedRate(new CheckOrderTask(), 3000, 10000);
-    timer.scheduleAtFixedRate(new EnterOrderTask(this), 3000, 25000);
+    timer.scheduleAtFixedRate(enterOrderTask, 3000, 25000);
 
     bot.addMessageCreateListener(event -> {
       if (!event.getMessageAuthor().isBotUser()){
@@ -40,7 +46,7 @@ public class Main {
           try {
             InputStream stream = event.getMessageAttachments().get(0).downloadAsInputStream();
             String data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            ProcessOrder.process(data);
+            ProcessOrder.testProcess(this, data);
           }
           catch(IOException e){
             e.printStackTrace();
@@ -52,6 +58,16 @@ public class Main {
         else if (event.getMessageContent().equals("!status")){
           event.getChannel().sendMessage("**" + ordersProcessed + "** orders have been processed.");
           event.getChannel().sendMessage("**" + cachedOrders.size() + "** orders are in the cache.");
+        }
+        else if (event.getMessageContent().equals("!test")){
+          try {
+            InputStream stream = event.getMessageAttachments().get(0).downloadAsInputStream();
+            String data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            ProcessOrder.testProcess(this, data);
+          }
+          catch(IOException e){
+            e.printStackTrace();
+          }
         }
         else if (event.getMessageContent().contains("!program")){
           // Parse message.
