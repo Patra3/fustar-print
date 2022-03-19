@@ -102,7 +102,7 @@ public class Main {
             db.mkdirs();
           File image = new File("db/" + part + ".png");
           // Take picture
-          Rectangle rect = new Rectangle(4, 49, 246, 201);
+          Rectangle rect = new Rectangle(4, 49, 50, 30);
           try{
             Robot r = new Robot();
             BufferedImage i = r.createScreenCapture(rect);

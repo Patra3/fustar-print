@@ -84,7 +84,7 @@ public class EnterOrderTask extends TimerTask {
       // Start
 
       // TO-DO: Detect and navigate to the takeout screen.
-      Rectangle rect = new Rectangle(4, 49, 246, 201);
+      Rectangle rect = new Rectangle(4, 49, 50, 30);
       BufferedImage image = robot.createScreenCapture(rect);
       File f = new File("db/");
       String[] files = f.list();
@@ -103,32 +103,37 @@ public class EnterOrderTask extends TimerTask {
               }
               else if (menuType.equals("delivery")){
                 enter("navigateOutDelivery");
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
                 enter("pressTakeout");
+                TimeUnit.SECONDS.sleep(2);
                 navCompleted = true;
               }
               else if (menuType.equals("recall")){
                 enter("navigateOutDelivery");
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
                 enter("pressTakeout");
+                TimeUnit.SECONDS.sleep(2);
                 navCompleted = true;
               }
               else if (menuType.equals("settle")){
                 enter("navigateOutDelivery");
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
                 enter("pressTakeout");
+                TimeUnit.SECONDS.sleep(2);
                 navCompleted = true;
               }
               else if (menuType.equals("dinein")){
                 enter("navigateOutDelivery");
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
                 enter("pressTakeout");
+                TimeUnit.SECONDS.sleep(2);
                 navCompleted = true;
               }
               else if (menuType.equals("reservation")){
                 enter("navigateOutDelivery");
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
                 enter("pressTakeout");
+                TimeUnit.SECONDS.sleep(2);
                 navCompleted = true;
               }
             }
