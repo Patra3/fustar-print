@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 public class Main {
 
+  protected boolean enabled = true;
+
   private String token = "ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.MZ6cwdzhW-6ezPQPszyqco6YMaE"; // DO NOT SHARE!
 
   protected DiscordApi bot = new DiscordApiBuilder().setToken(token).login().join();
@@ -42,7 +44,7 @@ public class Main {
     // First we init the Discord bot status.
     bot.updateActivity(" orders: " + ordersProcessed);
     // Next, we schedule a repeating task to check the online ordering server.
-    timer.scheduleAtFixedRate(new CheckOrderTask(), 3000, 10000);
+    timer.scheduleAtFixedRate(new CheckOrderTask(this), 3000, 10000);
     timer.scheduleAtFixedRate(enterOrderTask, 3000, 25000);
 
     bot.addMessageCreateListener(event -> {
@@ -58,14 +60,27 @@ public class Main {
             e.printStackTrace();
           }
         }
+        else if (event.getMessageContent().equals("!toggle")){
+          /**
+           * Toggles the online ordering system on or off as needed.
+           */
+          this.enabled = !this.enabled;
+          event.getChannel().sendMessage("Online ordering system turned **" + (this.enabled ? "on" : "off") + "**.");
+        }
         else if (event.getMessageContent().equals("!help")){
           event.getChannel().sendMessage("**Commands:**\n!testrun <attachment> - Runs an array of orders through the system.\n!cached - Get # of cached orders.\n!addTo <sequence> - Program inputs for each required item.");
         }
         else if (event.getMessageContent().equals("!status")){
+          /**
+           * Gets the status (how many orders done, in the cache).
+           */
           event.getChannel().sendMessage("**" + ordersProcessed + "** orders have been processed.");
           event.getChannel().sendMessage("**" + cachedOrders.size() + "** orders are in the cache.");
         }
         else if (event.getMessageContent().equals("!test")){
+          /**
+           * Test enter an order sent as an attachment in Discord.
+           */
           try {
             InputStream stream = event.getMessageAttachments().get(0).downloadAsInputStream();
             String data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
@@ -75,7 +90,11 @@ public class Main {
             e.printStackTrace();
           }
         }
-        else if (event.getMessageContent().contains("!snip")){
+        else if (event.getMessageContent().contains("!snap")){
+          /**
+           * Snaps the top left corner of a page, for identifying which menu we are on and 
+           * how to navigate back to the takeout menu.
+           */
           String part = event.getMessageContent().substring(6);
           // Create folder if not exist.
           File db = new File("db/");

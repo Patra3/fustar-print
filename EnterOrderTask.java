@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+
 import java.awt.Robot;
 import java.awt.Point;
 import java.awt.MouseInfo;
@@ -10,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.Rectangle;
 import java.util.HashMap;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,6 +50,31 @@ public class EnterOrderTask extends TimerTask {
   }
 
   /**
+   * Compares two BufferedImages to see if they are equal, visually.
+   * Code derived from StackOverflow's devrobf and other contributors.
+   * Original answer here:
+   * https://stackoverflow.com/a/15305092
+   * 
+   * Attributed CC BY-SA 3.0
+   * @param img1
+   * @param img2
+   * @return
+   */
+  public boolean bufferedImagesEqual(BufferedImage img1, BufferedImage img2) {
+    if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
+        for (int x = 0; x < img1.getWidth(); x++) {
+            for (int y = 0; y < img1.getHeight(); y++) {
+                if (img1.getRGB(x, y) != img2.getRGB(x, y))
+                    return false;
+            }
+        }
+    } else {
+        return false;
+    }
+    return true;
+  }
+
+  /**
    * Enters an online order into the POS.
    * @param testmode Whether to submit or leave it.
    * @param order JSONObject
@@ -56,6 +85,65 @@ public class EnterOrderTask extends TimerTask {
 
       // TO-DO: Detect and navigate to the takeout screen.
       Rectangle rect = new Rectangle(4, 49, 246, 201);
+      BufferedImage image = robot.createScreenCapture(rect);
+      File f = new File("db/");
+      String[] files = f.list();
+      boolean navCompleted = false;
+      for (String file : files){
+        if (file.contains(".png")){
+          // Compare it.
+          BufferedImage comparison = null;
+          try {
+            comparison = ImageIO.read(new File("db/" + file));
+            if (bufferedImagesEqual(image, comparison)){
+              // Get the screen type.
+              String menuType = file.substring(0, file.length() - 4);
+              if (menuType.equals("takeout")){
+                navCompleted = true;
+              }
+              else if (menuType.equals("delivery")){
+                enter("navigateOutDelivery");
+                TimeUnit.SECONDS.sleep(2);
+                enter("pressTakeout");
+                navCompleted = true;
+              }
+              else if (menuType.equals("recall")){
+                enter("navigateOutDelivery");
+                TimeUnit.SECONDS.sleep(2);
+                enter("pressTakeout");
+                navCompleted = true;
+              }
+              else if (menuType.equals("settle")){
+                enter("navigateOutDelivery");
+                TimeUnit.SECONDS.sleep(2);
+                enter("pressTakeout");
+                navCompleted = true;
+              }
+              else if (menuType.equals("dinein")){
+                enter("navigateOutDelivery");
+                TimeUnit.SECONDS.sleep(2);
+                enter("pressTakeout");
+                navCompleted = true;
+              }
+              else if (menuType.equals("reservation")){
+                enter("navigateOutDelivery");
+                TimeUnit.SECONDS.sleep(2);
+                enter("pressTakeout");
+                navCompleted = true;
+              }
+            }
+          }
+          catch(Exception e){
+            e.printStackTrace();
+          }
+        }
+      }
+
+      if (!navCompleted){
+        // Will try again later.
+        currentlyProcessingOrder = null;
+        return;
+      }
 
       // Press "new order"
       enter("takeoutNewOrder");

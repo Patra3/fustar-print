@@ -7,8 +7,18 @@ import java.util.TimerTask;
 
 public class CheckOrderTask extends TimerTask {
 
+  private Main main;
+
+  public CheckOrderTask(Main main){
+    this.main = main;
+  }
+
   @Override
   public void run(){
+
+    if (!main.enabled){
+      return;
+    }
 
     System.out.println(".");
 
