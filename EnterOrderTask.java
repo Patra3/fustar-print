@@ -1,11 +1,18 @@
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.awt.Robot;
 import java.awt.Point;
 import java.awt.MouseInfo;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.sql.Time;
+import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
 
 public class EnterOrderTask extends TimerTask {
 
@@ -45,8 +52,72 @@ public class EnterOrderTask extends TimerTask {
   public void enterOrder(boolean testmode, JSONObject order){
     try {
       // Start
-      // TO-DO;
-      // Remove the item from the list and the variable.
+
+      // TO-DO: Detect and navigate to the takeout screen.
+
+      // Press "new order"
+      enter("takeoutNewOrder");
+      TimeUnit.SECONDS.sleep(2);
+      enter("customerMenu");
+      TimeUnit.SECONDS.sleep(1);
+      enter("phoneNumberEntryMenu");
+      TimeUnit.SECONDS.sleep(1);
+      
+      // Enter the phone number
+      JSONObject body = order.getJSONObject("body");
+      type(body.getString("phone"));
+      // Press enter
+      enter("phoneNumberSubmit");
+      TimeUnit.SECONDS.sleep(3);
+      enter("phoneNumberSubmit2");
+
+      enter("firstName1");
+      type(body.getString("customerName"));
+      enter("firstNameSubmit");
+
+      // Now we can enter items.
+      TimeUnit.SECONDS.sleep(1);
+
+      JSONArray items = body.getJSONArray("items");
+      for (int i = 0; i < items.length(); i++){
+        JSONObject item = items.getJSONObject(i);
+        // Enter item into computer.
+        enter(item.getString("name"));
+        TimeUnit.MILLISECONDS.sleep(300);
+        // Check if item has small/large selection.
+        // Decode menuItemReference
+        JSONObject meta = new JSONObject(new String(Base64.getDecoder().decode(item.getString("menuItemReference"))));
+        if (meta.getJSONArray("price").length() > 1){
+          // Check size now.
+          if (item.getString("size").equals("Small")){
+            enter("small");
+          }
+          else{
+            enter("large");
+          }
+        }
+        if (i == 0){
+          enter("customChoice");
+          type("need ready for " + body.getString("customerTime"));
+          enter("customChoiceSubmit");
+        }
+        if (Integer.parseInt(item.getString("quantity")) > 1){
+          enter("quantity");
+          type(item.getString("quantity"));
+          enter("quantitySubmit");
+        }
+        if (item.getString("comments").length() > 0){
+          enter("customChoice");
+          type(item.getString("comments"));
+          enter("customChoiceSubmit");
+        }
+      }
+
+      // Now we can submit the order.
+      if (!testmode){
+        enter("done");
+      }
+      
       Main.cachedOrders.remove(0);
       currentlyProcessingOrder = null;
       main.bot.updateActivity(" orders: " + ++main.ordersProcessed);
@@ -56,6 +127,59 @@ public class EnterOrderTask extends TimerTask {
       // Remove the item from currently processing.
       // but, do not remove it from cache.
       currentlyProcessingOrder = null;
+    }
+  }
+
+  protected void type(String in){
+    HashMap<String, Integer> map = new HashMap<>();
+    map.put("a", KeyEvent.VK_A);
+    map.put("b", KeyEvent.VK_B);
+    map.put("c", KeyEvent.VK_C);
+    map.put("d", KeyEvent.VK_D);
+    map.put("e", KeyEvent.VK_E);
+    map.put("f", KeyEvent.VK_F);
+    map.put("g", KeyEvent.VK_G);
+    map.put("h", KeyEvent.VK_H);
+    map.put("i", KeyEvent.VK_I);
+    map.put("j", KeyEvent.VK_J);
+    map.put("k", KeyEvent.VK_K);
+    map.put("l", KeyEvent.VK_L);
+    map.put("m", KeyEvent.VK_M);
+    map.put("n", KeyEvent.VK_N);
+    map.put("o", KeyEvent.VK_O);
+    map.put("p", KeyEvent.VK_P);
+    map.put("q", KeyEvent.VK_Q);
+    map.put("r", KeyEvent.VK_R);
+    map.put("s", KeyEvent.VK_S);
+    map.put("t", KeyEvent.VK_T);
+    map.put("u", KeyEvent.VK_U);
+    map.put("v", KeyEvent.VK_V);
+    map.put("w", KeyEvent.VK_W);
+    map.put("x", KeyEvent.VK_X);
+    map.put("y", KeyEvent.VK_Y);
+    map.put("z", KeyEvent.VK_Z);
+    map.put("0", KeyEvent.VK_0);
+    map.put("1", KeyEvent.VK_1);
+    map.put("2", KeyEvent.VK_2);
+    map.put("3", KeyEvent.VK_3);
+    map.put("4", KeyEvent.VK_4);
+    map.put("5", KeyEvent.VK_5);
+    map.put("6", KeyEvent.VK_6);
+    map.put("7", KeyEvent.VK_7);
+    map.put("8", KeyEvent.VK_8);
+    map.put("9", KeyEvent.VK_9);
+    map.put(",", KeyEvent.VK_COMMA);
+    map.put("!", KeyEvent.VK_EXCLAMATION_MARK);
+    map.put(".", KeyEvent.VK_PERIOD);
+    map.put(" ", KeyEvent.VK_SPACE);
+    map.put("&", KeyEvent.VK_AMPERSAND);
+    for (int i = 0; i < in.length(); i++){
+      String c = (in.charAt(i) + "").toLowerCase();
+      if (map.containsKey(c)){
+        int key = map.get(c);
+        robot.keyPress(key);
+        robot.keyRelease(key);
+      }
     }
   }
 
@@ -88,7 +212,7 @@ public class EnterOrderTask extends TimerTask {
    * @param order
    */
   protected static void addOrderToCache(JSONObject order){
-
+    Main.cachedOrders.add(order);
   }
   
 }

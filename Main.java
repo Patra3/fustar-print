@@ -49,8 +49,9 @@ public class Main {
         else if (event.getMessageContent().equals("!help")){
           event.getChannel().sendMessage("**Commands:**\n!testrun <attachment> - Runs an array of orders through the system.\n!cached - Get # of cached orders.\n!addTo <sequence> - Program inputs for each required item.");
         }
-        else if (event.getMessageContent().equals("!cached")){
-          event.getChannel().sendMessage(ordersProcessed + " orders have been processed.");
+        else if (event.getMessageContent().equals("!status")){
+          event.getChannel().sendMessage("**" + ordersProcessed + "** orders have been processed.");
+          event.getChannel().sendMessage("**" + cachedOrders.size() + "** orders are in the cache.");
         }
         else if (event.getMessageContent().contains("!program")){
           // Parse message.
