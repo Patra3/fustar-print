@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -18,6 +19,7 @@ import java.awt.image.BufferedImage;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Main {
@@ -108,6 +110,43 @@ public class Main {
             BufferedImage i = r.createScreenCapture(rect);
             ImageIO.write(i, "png", image);
             event.getChannel().sendMessage("Image saved as " + part + ".png.");
+          }
+          catch(Exception e){
+            e.printStackTrace();
+          }
+        }
+        else if (event.getMessageContent().equals("!autoprogram")){
+          try {
+            event.getChannel().sendMessage("Auto-programming starting in 5 seconds.");
+            TimeUnit.SECONDS.sleep(5);  
+            InputStream stream = event.getMessageAttachments().get(0).downloadAsInputStream();
+            String data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            JSONObject menu = new JSONObject(data);
+            JSONArray items = menu.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++){
+              JSONObject item = items.getJSONObject(i);
+              String fullItemName = item.getString("code") + ". " + item.getString("name");
+              // Delete existing file if it is there.
+              File sequence = new File("db/" + fullItemName + ".txt");
+              if (sequence.exists())
+                sequence.delete();
+              String d = "";
+              // Register click for category.
+              event.getChannel().sendMessage("Registering **" + fullItemName + "**:");
+              event.getChannel().sendMessage("Please move mouse to the category button. Locking in 3 seconds.");
+              TimeUnit.SECONDS.sleep(3);
+              Point p = MouseInfo.getPointerInfo().getLocation();
+              // Register click for item.
+              d += "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
+              event.getChannel().sendMessage("Please move mouse to the item button. Locking in 3 seconds.");
+              TimeUnit.SECONDS.sleep(3);
+              p = MouseInfo.getPointerInfo().getLocation();
+              d += "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
+              FileWriter write = new FileWriter(sequence);
+              write.write(d);
+              write.close();
+              event.getChannel().sendMessage("Wrote `[ " + d + " ]` to sequence `" + fullItemName + ".txt`.");
+            }
           }
           catch(Exception e){
             e.printStackTrace();
