@@ -7,7 +7,9 @@ import java.awt.Point;
 import java.awt.MouseInfo;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
 import java.util.HashMap;
+import java.awt.image.BufferedImage;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +55,7 @@ public class EnterOrderTask extends TimerTask {
       // Start
 
       // TO-DO: Detect and navigate to the takeout screen.
+      Rectangle rect = new Rectangle(4, 49, 246, 201);
 
       // Press "new order"
       enter("takeoutNewOrder");

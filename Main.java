@@ -7,8 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Timer;
+
+import javax.imageio.ImageIO;
+
 import java.awt.Point;
 import java.awt.MouseInfo;
+import java.awt.Robot;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -66,6 +72,25 @@ public class Main {
             ProcessOrder.testProcess(this, data);
           }
           catch(IOException e){
+            e.printStackTrace();
+          }
+        }
+        else if (event.getMessageContent().contains("!snip")){
+          String part = event.getMessageContent().substring(6);
+          // Create folder if not exist.
+          File db = new File("db/");
+          if (!db.exists())
+            db.mkdirs();
+          File image = new File("db/" + part + ".png");
+          // Take picture
+          Rectangle rect = new Rectangle(4, 49, 246, 201);
+          try{
+            Robot r = new Robot();
+            BufferedImage i = r.createScreenCapture(rect);
+            ImageIO.write(i, "png", image);
+            event.getChannel().sendMessage("Image saved as " + part + ".png.");
+          }
+          catch(Exception e){
             e.printStackTrace();
           }
         }
