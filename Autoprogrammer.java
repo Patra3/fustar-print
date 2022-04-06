@@ -11,6 +11,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 public class Autoprogrammer implements Runnable {
 
   private MessageCreateEvent event;
@@ -49,8 +50,8 @@ public class Autoprogrammer implements Runnable {
         }
         event.getChannel().sendMessage("Registering **" + fullItemName + "**:");
         // Register click for item.
-        event.getChannel().sendMessage("Please move mouse to the item button. Locking in 3 seconds.");
-        TimeUnit.SECONDS.sleep(3);
+        event.getChannel().sendMessage("Please move mouse to the item button. Locking in 8 seconds.");
+        TimeUnit.SECONDS.sleep(8);
         p = MouseInfo.getPointerInfo().getLocation();
         d += typeLoc;
         d += "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
