@@ -38,9 +38,9 @@ public class Autoprogrammer implements Runnable {
         // Delete existing file if it is there.
 
         MessageDigest digest = MessageDigest.getInstance("MD5");
-        digest.update(("db/" + fullItemName + ".txt").getBytes());
+        digest.update((fullItemName).getBytes("UTF-8"));
         
-        File sequence = new File("db/" + fullItemName + ".txt");
+        File sequence = new File("db/" + new String(digest.digest(), StandardCharsets.UTF_8) + ".txt");
         if (sequence.exists())
           sequence.delete();
         String d = "";
