@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import java.awt.Point;
@@ -35,6 +36,10 @@ public class Autoprogrammer implements Runnable {
         JSONObject item = items.getJSONObject(i);
         String fullItemName = item.getString("code") + ". " + item.getString("name");
         // Delete existing file if it is there.
+
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        digest.update(("db/" + fullItemName + ".txt").getBytes());
+        
         File sequence = new File("db/" + fullItemName + ".txt");
         if (sequence.exists())
           sequence.delete();
