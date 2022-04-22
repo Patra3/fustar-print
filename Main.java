@@ -44,10 +44,12 @@ public class Main {
     // First we init the Discord bot status.
     bot.updateActivity(" orders: " + ordersProcessed);
     // Next, we schedule a repeating task to check the online ordering server.
+    Logger.log("Online ordering system started! *");
     timer.scheduleAtFixedRate(new CheckOrderTask(this), 3000, 10000);
     timer.scheduleAtFixedRate(enterOrderTask, 3000, 25000);
 
     bot.addMessageCreateListener(event -> {
+      Logger.log("Command received: " + event.getMessageContent());
       if (!event.getMessageAuthor().isBotUser()){
         if (event.getMessageContent().equals("!testrun")){
           // Obtain the file.
