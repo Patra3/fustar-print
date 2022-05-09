@@ -24,7 +24,7 @@ public class Autoprogrammer implements Runnable {
   @Override
   public void run(){
     try {
-      event.getChannel().sendMessage("Auto-programming starting in 5 seconds.");
+      Logger.log("Auto-programming starting in 5 seconds.");
       TimeUnit.SECONDS.sleep(5);  
       InputStream stream = event.getMessageAttachments().get(0).downloadAsInputStream();
       String data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
@@ -47,15 +47,15 @@ public class Autoprogrammer implements Runnable {
         Point p = MouseInfo.getPointerInfo().getLocation();
         if (currentType != item.getInt("type")){
           currentType = item.getInt("type");
-          event.getChannel().sendMessage("Registering **" + item.getString("code") + "**:");
+          Logger.log("Registering **" + item.getString("code") + "**:");
           // Register click for category.
-          event.getChannel().sendMessage("Please move mouse to the category button. Locking in 3 seconds.");
+          Logger.log("Please move mouse to the category button. Locking in 3 seconds.");
           TimeUnit.SECONDS.sleep(3);
           typeLoc = "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
         }
-        event.getChannel().sendMessage("Registering **" + fullItemName + "**:");
+        Logger.log("Registering **" + fullItemName + "**:");
         // Register click for item.
-        event.getChannel().sendMessage("Please move mouse to the item button. Locking in 8 seconds.");
+        Logger.log("Please move mouse to the item button. Locking in 8 seconds.");
         TimeUnit.SECONDS.sleep(8);
         p = MouseInfo.getPointerInfo().getLocation();
         d += typeLoc;
@@ -63,7 +63,7 @@ public class Autoprogrammer implements Runnable {
         FileWriter write = new FileWriter(sequence);
         write.write(d);
         write.close();
-        event.getChannel().sendMessage("Wrote `[ " + d + " ]` to sequence `" + fullItemName + ".txt`.");
+        Logger.log("Wrote `[ " + d + " ]` to sequence `" + fullItemName + ".txt`.");
       }
     }
     catch(Exception e){
