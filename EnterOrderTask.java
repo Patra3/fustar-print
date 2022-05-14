@@ -35,7 +35,7 @@ public class EnterOrderTask extends TimerTask {
       if ((int)p.getX() == 250 && (int)p.getY() == 250){
         // Safe to enter orders... maybe.
         // Enter only the first one, try again later.
-        if (currentlyProcessingOrder == null){
+        if (currentlyProcessingOrder == null && Main.cachedOrders.size() > 0){
           currentlyProcessingOrder = Main.cachedOrders.get(0);
           enterOrder(false, currentlyProcessingOrder);
         }
@@ -289,7 +289,7 @@ public class EnterOrderTask extends TimerTask {
   }
 
   public EnterOrderTask(Main main){
-    mouseTestActive = true;
+    mouseTestActive = false;
     this.main = main;
     // Init the mouse test. Scan on next cycle.
     try {
