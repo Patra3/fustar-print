@@ -22,11 +22,11 @@ import org.json.JSONObject;
 
 public class Main {
 
-  protected boolean enabled = true;
+  protected boolean enabled = false; // Change to 'True' for production.
 
   private String token = "ODQyMTQ4MjIwMDM3NzU5MDI3.YJxFpg.MZ6cwdzhW-6ezPQPszyqco6YMaE"; // DO NOT SHARE!
 
-  protected DiscordApi bot = new DiscordApiBuilder().setToken(token).login().join();
+  protected DiscordApi bot = new DiscordApiBuilder().setToken(token).login().join(); // DiscordApi Bot instance for certain commands.
 
   public Timer timer = new Timer();
 
