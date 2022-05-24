@@ -34,13 +34,15 @@ public class Autoprogrammer implements Runnable {
       String typeLoc = "";
       for (int i = 0; i < items.length(); i++){
         JSONObject item = items.getJSONObject(i);
-        String fullItemName = item.getString("code") + ". " + item.getString("name");
+        String fullItemName = item.getString("code") + ". " + item.getString("name").replaceAll("/", "").replaceAll("\\", "");
         // Delete existing file if it is there.
 
         MessageDigest digest = MessageDigest.getInstance("MD5");
         digest.update((fullItemName).getBytes("UTF-8"));
+        String rt = new String(digest.digest());
+        System.out.println("digest: " + rt);
         
-        File sequence = new File("db/" + new String(digest.digest(), StandardCharsets.UTF_8) + ".txt");
+        File sequence = new File("db/" + rt + ".txt");
         if (sequence.exists())
           sequence.delete();
         String d = "";
@@ -49,14 +51,14 @@ public class Autoprogrammer implements Runnable {
           currentType = item.getInt("type");
           Logger.log("Registering **" + item.getString("code") + "**:");
           // Register click for category.
-          Logger.log("Please move mouse to the category button. Locking in 3 seconds.");
-          TimeUnit.SECONDS.sleep(3);
+          Logger.log("Please move mouse to the category button. Locking in 5 seconds.");
+          TimeUnit.SECONDS.sleep(5);
           typeLoc = "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
         }
         Logger.log("Registering **" + fullItemName + "**:");
         // Register click for item.
-        Logger.log("Please move mouse to the item button. Locking in 8 seconds.");
-        TimeUnit.SECONDS.sleep(8);
+        Logger.log("Please move mouse to the item button. Locking in 5 seconds.");
+        TimeUnit.SECONDS.sleep(5);
         p = MouseInfo.getPointerInfo().getLocation();
         d += typeLoc;
         d += "" + ((int)p.getX()) + "," + ((int)p.getY()) + ";";
