@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
@@ -34,13 +35,12 @@ public class Autoprogrammer implements Runnable {
       String typeLoc = "";
       for (int i = 0; i < items.length(); i++){
         JSONObject item = items.getJSONObject(i);
-        String fullItemName = item.getString("code") + ". " + item.getString("name").replaceAll("/", "").replaceAll("\\", "");
+        String fullItemName = item.getString("code") + ". " + item.getString("name");
         // Delete existing file if it is there.
 
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-        digest.update((fullItemName).getBytes("UTF-8"));
-        String rt = new String(digest.digest());
-        System.out.println("digest: " + rt);
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        md5.update(StandardCharsets.UTF_8.encode(fullItemName));
+        String rt = String.format("%032x", new BigInteger(1, md5.digest()));
         
         File sequence = new File("db/" + rt + ".txt");
         if (sequence.exists())

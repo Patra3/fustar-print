@@ -67,17 +67,17 @@ public class Main {
            * Toggles the online ordering system on or off as needed.
            */
           this.enabled = !this.enabled;
-          event.getChannel().sendMessage("Online ordering system turned **" + (this.enabled ? "on" : "off") + "**.");
+          event.getChannel().sendMessage("Online ordering system turned " + (this.enabled ? "on" : "off") + ".");
         }
         else if (event.getMessageContent().equals("!help")){
-          event.getChannel().sendMessage("**Commands:**\n!testrun <attachment> - Runs an array of orders through the system.\n!cached - Get # of cached orders.\n!addTo <sequence> - Program inputs for each required item.");
+          event.getChannel().sendMessage("Commands:\n!testrun <attachment> - Runs an array of orders through the system.\n!cached - Get # of cached orders.\n!addTo <sequence> - Program inputs for each required item.");
         }
         else if (event.getMessageContent().equals("!status")){
           /**
            * Gets the status (how many orders done, in the cache).
            */
-          event.getChannel().sendMessage("**" + ordersProcessed + "** orders have been processed.");
-          event.getChannel().sendMessage("**" + cachedOrders.size() + "** orders are in the cache.");
+          event.getChannel().sendMessage(ordersProcessed + " orders have been processed.");
+          event.getChannel().sendMessage(cachedOrders.size() + " orders are in the cache.");
         }
         else if (event.getMessageContent().equals("!test")){
           /**
